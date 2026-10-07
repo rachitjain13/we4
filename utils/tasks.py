@@ -1,6 +1,7 @@
 from datetime import datetime
 import streamlit as st
 from utils.state import add_activity_log
+from utils.alerts import add_alert
 from utils.contestants import get_active_contestants, get_contestant_by_name
 
 def get_all_tasks():
@@ -103,6 +104,7 @@ def complete_task(task_id):
         f"Task '{t['name']}' marked COMPLETED.{detail}",
         log_type="TASK"
     )
+    add_alert("INFO", "Task Completed", f"Task '{t['name']}' has been completed.{detail}", priority="MEDIUM", related_task=t['name'])
     return True, f"Task completed successfully!{detail}"
 
 def delete_task(task_id):

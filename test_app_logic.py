@@ -6,6 +6,10 @@ from utils.contestants import (
     revoke_nomination, grant_immunity, remove_immunity, evict_contestant, get_current_captain
 )
 from utils.tasks import get_all_tasks, create_task, start_task, complete_task, delete_task
+from utils.questions import (
+    get_all_questions, get_question_by_id, submit_answer,
+    create_question, reset_question, delete_question, get_question_stats
+)
 
 def run_tests():
     init_session_state()
@@ -92,9 +96,54 @@ def run_tests():
     assert st.session_state.current_announcement["message"] == "Test broadcast"
     print("Test 8 Passed: Announcement system verified.")
 
-    print("\n=======================================================")
-    print("ALL 12 MANDATORY BUSINESS LOGIC RULES VERIFIED 100% OPERATIONAL!")
-    print("=======================================================")
+    # 9. Test Questions Module - Initial Questions Loaded
+    questions = get_all_questions()
+    assert len(questions) >= 5, f"Expected at least 5 questions, got {len(questions)}"
+    q1 = get_question_by_id("q-01")
+    assert q1 is not None, "q-01 should exist"
+    assert q1["type"] == "hex"
+    print("Test 9 Passed: Questions loaded with multiple puzzle types.")
+
+    # 10. Test Questions - Incorrect Answer
+    meera = get_contestant_by_name("Meera")
+    meera_pts_before = meera["points"]
+    ok_wrong, msg_wrong, pts_wrong = submit_answer("q-01", meera["id"], "wrong_answer_xyz")
+    assert not ok_wrong, "Wrong answer should fail"
+    assert pts_wrong == 0, "No points should be awarded for wrong answer"
+    assert meera["points"] == meera_pts_before, "Points should remain unchanged"
+    assert not q1["solved"], "Question should remain unsolved"
+    print("Test 10 Passed: Incorrect answer rejection verified.")
+
+    # 11. Test Questions - Correct Answer & Leaderboard update
+    ok_correct, msg_correct, pts_awarded = submit_answer("q-01", meera["id"], "solaris")
+    assert ok_correct, "Expected 'solaris' to be correct"
+    assert pts_awarded == 500, f"Expected 500 points, got {pts_awarded}"
+    assert meera["points"] == meera_pts_before + 500, "Meera should receive +500 points"
+    assert q1["solved"] == True, "q-01 should now be marked solved"
+    assert q1["solved_by"] == meera["name"].upper()
+
+    # Cannot solve twice
+    ok_again, msg_again, _ = submit_answer("q-01", meera["id"], "solaris")
+    assert not ok_again, "Cannot solve already-solved question"
+    print("Test 11 Passed: Correct answer scoring and double-submission guard verified.")
+
+    # 12. Test Questions - Evicted contestant restriction & stats
+    ok_ev_ans, msg_ev_ans, _ = submit_answer("q-02", nisha["id"], "antigravity")
+    assert not ok_ev_ans, "Evicted contestant (Nisha) must NOT be able to solve questions"
+    
+    q_stats = get_question_stats()
+    assert q_stats["solved"] >= 1, "At least 1 question should be counted as solved"
+    assert q_stats["top_solver"] == meera["name"].upper(), f"Expected top solver Meera, got {q_stats['top_solver']}"
+    
+    # Test reset & delete question
+    reset_question("q-01")
+    assert not q1["solved"], "Reset question should be unsolved"
+    assert meera["points"] == meera_pts_before + 500, "Points should remain intact upon reset per Rule 10"
+    print("Test 12 Passed: Evicted solver restriction, stats & reset safety verified.")
+
+    print("\n=================================================================")
+    print("ALL 12 MANDATORY RULES + QUESTIONS PUZZLE MODULE FULLY OPERATIONAL!")
+    print("=================================================================")
 
 if __name__ == "__main__":
     run_tests()

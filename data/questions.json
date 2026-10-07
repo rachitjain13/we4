@@ -1,0 +1,73 @@
+[
+  {
+    "id": "q-01",
+    "title": "Q1",
+    "type": "hex",
+    "content": "46 89 5e 05 ab 1e 74 07 1c 7a cb",
+    "hint": "Cryptographic key fragment decoded from the House surveillance feed.",
+    "answer": "solaris",
+    "points": 500,
+    "max_points": 1000,
+    "case_sensitive": false,
+    "solved": false,
+    "solved_by": null,
+    "solved_at": null
+  },
+  {
+    "id": "q-02",
+    "title": "Q2",
+    "type": "ascii",
+    "content": "69 99 115 111 103 32 70 100 104 111 118 120 115 116\n113 115 100 116 110",
+    "hint": "Byte sequence intercepted from the living room terminal.",
+    "answer": "antigravity",
+    "points": 500,
+    "max_points": 1000,
+    "case_sensitive": false,
+    "solved": false,
+    "solved_by": null,
+    "solved_at": null
+  },
+  {
+    "id": "q-03",
+    "title": "Q3",
+    "type": "symbol",
+    "content": "• •   •••   ••   •••   •\n—•—   ••—   ••   —••   ••—•\n•—•   —••   •••  —•    •••",
+    "hint": "Optical pulse signal flashed from the courtyard sensor mast.",
+    "answer": "cipher",
+    "points": 400,
+    "max_points": 800,
+    "case_sensitive": false,
+    "solved": false,
+    "solved_by": null,
+    "solved_at": null
+  },
+  {
+    "id": "q-04",
+    "title": "Q4",
+    "type": "text",
+    "content": "Decode the House surveillance anagram: \"SAB OBS BGI\"",
+    "hint": "Three-word authority signature governing all house protocols.",
+    "answer": "big boss",
+    "points": 300,
+    "max_points": 600,
+    "case_sensitive": false,
+    "solved": false,
+    "solved_by": null,
+    "solved_at": null
+  },
+  {
+    "id": "q-05",
+    "title": "Q5",
+    "type": "image",
+    "content": "Examine the House Blueprint Grid below. Identify the designated high-security quarantine sector (Format: Word + Number).",
+    "hint": "Check the central fortified quadrant in the schematic.",
+    "image_path": "assets/blueprint.svg",
+    "answer": "vault 9",
+    "points": 600,
+    "max_points": 1200,
+    "case_sensitive": false,
+    "solved": false,
+    "solved_by": null,
+    "solved_at": null
+  }
+]

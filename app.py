@@ -39,6 +39,30 @@ from utils.tasks import (
     complete_task,
     delete_task,
 )
+from utils.questions import (
+    get_all_questions,
+    get_question_by_id,
+    submit_answer,
+    create_question,
+    reset_question,
+    delete_question,
+    get_question_stats,
+)
+from utils.alerts import (
+    get_all_alerts,
+    get_unread_alerts,
+    get_unread_alerts_count,
+    add_alert,
+    mark_alert_read,
+    mark_all_alerts_read,
+    clear_old_alerts,
+)
+from utils.analytics import (
+    get_analytics_summary,
+    get_contestant_performance_data,
+    get_performance_spotlights,
+    get_team_comparison_analytics,
+)
 from utils.ui import (
     apply_custom_styles,
     render_header,
@@ -85,9 +109,12 @@ with st.sidebar:
         "▌ Contestants",
         "▌ Tasks",
         "▌ Leaderboard",
+        "▌ Performance Analytics",
+        "▌ Questions",
         "▌ Nominations",
         "▌ Danger Zone",
         "▌ Announcements",
+        "▌ Alert Center",
         "▌ Control Room",
     ]
 
@@ -104,6 +131,7 @@ with st.sidebar:
     active_cnt = len(get_active_contestants())
     evicted_cnt = len(get_evicted_contestants())
     nom_cnt = len([c for c in get_active_contestants() if c.get("is_nominated", False)])
+    unread_cnt = get_unread_alerts_count()
     captain = get_current_captain()
 
     st.markdown(
@@ -111,6 +139,7 @@ with st.sidebar:
         <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #777777; line-height: 1.9;">
             <div>&bull; ACTIVE: <strong style="color: #ffffff;">{active_cnt}</strong></div>
             <div>&bull; IN DANGER: <strong style="color: {'#ffffff' if nom_cnt > 0 else '#777777'}; font-weight: 800;">{nom_cnt}</strong></div>
+            <div>&bull; ALERTS: <strong style="color: {'#ffffff' if unread_cnt > 0 else '#777777'}; font-weight: 800;">[{unread_cnt}]</strong></div>
             <div>&bull; EVICTED: <strong style="color: #aaaaaa;">{evicted_cnt}</strong></div>
             <div>&bull; CAPTAIN: <strong style="color: #ffffff;">{captain['name'].upper() if captain else 'NONE'}</strong></div>
         </div>
@@ -785,6 +814,298 @@ elif "Leaderboard" in selected_nav:
 
 
 # ==============================================================================
+# VIEW: QUESTIONS / PUZZLE CHALLENGE
+# ==============================================================================
+elif "Questions" in selected_nav:
+    st.markdown(
+        """
+        <div class="bb-question-banner">
+            <div>
+                <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff; letter-spacing: 0.04em;">&#127942; QUESTIONS</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: #aaaaaa; margin-top: 3px;">
+                    HOUSE CHALLENGE &bull; Solve the challenge questions to earn points.
+                </div>
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #666666; text-transform: uppercase;">
+                SURVEILLANCE CIPHER LAB
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    q_stats = get_question_stats()
+    all_q = get_all_questions()
+
+    # Progress KPI Row
+    col_qp1, col_qp2, col_qp3 = st.columns(3)
+    with col_qp1:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Questions Progress</div>
+                <div class="bb-kpi-val">{q_stats['solved']} / {q_stats['total']} SOLVED</div>
+                <div class="bb-kpi-sub">Total challenges deciphered</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col_qp2:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Total Question Points</div>
+                <div class="bb-kpi-val">{q_stats['points_awarded']:,} PTS</div>
+                <div class="bb-kpi-sub">Points disbursed to solvers</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col_qp3:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Remaining Challenges</div>
+                <div class="bb-kpi-val">{q_stats['remaining']}</div>
+                <div class="bb-kpi-sub">Unsolved ciphers active</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<div style='height: 1.25rem;'></div>", unsafe_allow_html=True)
+
+    # SOLVING CONTESTANT SELECTOR (Rule: Only active, non-evicted contestants)
+    active_contestants = get_active_contestants()
+    if not active_contestants:
+        st.warning("No active contestants available to solve questions.")
+        active_contestant = None
+    else:
+        col_c_sel, col_empty = st.columns([0.45, 0.55])
+        with col_c_sel:
+            c_options = [c["name"] for c in active_contestants]
+            selected_solver_name = st.selectbox(
+                "SOLVING CONTESTANT (Answers are scored for this housemate)",
+                c_options,
+                key="select_solving_contestant"
+            )
+            active_contestant = get_contestant_by_name(selected_solver_name)
+
+    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+
+    # FILTERS & SEARCH ROW
+    col_qsearch, col_qfilter, col_qtype = st.columns([0.45, 0.3, 0.25])
+    with col_qsearch:
+        search_query = st.text_input("Search questions...", placeholder="Filter by ID, content or type...", key="q_search_input")
+    with col_qfilter:
+        status_filter = st.selectbox("Status Filter", ["ALL", "UNSOLVED ONLY", "SOLVED ONLY"], key="q_status_filter")
+    with col_qtype:
+        type_filter = st.selectbox("Type Filter", ["ALL TYPES", "HEX", "ASCII", "SYMBOL", "TEXT", "IMAGE"], key="q_type_filter")
+
+    # Filter questions list
+    display_questions = all_q
+    if search_query and search_query.strip():
+        q_low = search_query.strip().lower()
+        display_questions = [
+            q for q in display_questions
+            if q_low in q.get("title", "").lower() or q_low in q.get("content", "").lower() or q_low in q.get("type", "").lower() or (q.get("solved_by") and q_low in q.get("solved_by", "").lower())
+        ]
+    if status_filter == "UNSOLVED ONLY":
+        display_questions = [q for q in display_questions if not q.get("solved", False)]
+    elif status_filter == "SOLVED ONLY":
+        display_questions = [q for q in display_questions if q.get("solved", False)]
+    if type_filter != "ALL TYPES":
+        display_questions = [q for q in display_questions if q.get("type", "").lower() == type_filter.lower()]
+
+    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+
+    # QUESTION CARDS
+    if not display_questions:
+        render_empty_state("NO QUESTIONS FOUND", "No questions match your current search and filter settings.")
+    else:
+        for q in display_questions:
+            is_solved = q.get("solved", False)
+            card_class = "bb-question-card solved" if is_solved else "bb-question-card"
+
+            st.markdown(f"<div class='{card_class}'>", unsafe_allow_html=True)
+            
+            # Top row of Question card
+            col_qhead, col_qmeta = st.columns([0.7, 0.3])
+            with col_qhead:
+                st.markdown(
+                    f"""
+                    <div style="display: flex; align-items: baseline; gap: 0.75rem;">
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 900; color: #ffffff;">{q.get('title', 'Q')}</span>
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 700; padding: 2px 7px; border-radius: 3px; background-color: #111111; border: 1px solid #333333; color: #aaaaaa; text-transform: uppercase;">
+                            {q.get('type', 'TEXT').upper()}
+                        </span>
+                        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #666666;">
+                            {q.get('hint', '')}
+                        </span>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            with col_qmeta:
+                st.markdown(
+                    f"""
+                    <div class="bb-reward-meta">
+                        <div class="bb-reward-pts">+{q.get('points', 500)} ANSWER</div>
+                        <div class="bb-reward-sub">UP TO {q.get('max_points', 1000)} BUILD</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+            # Content area
+            if q.get("type") in ["hex", "ascii", "symbol"]:
+                st.markdown(f"<div class='bb-puzzle-code'>{q.get('content')}</div>", unsafe_allow_html=True)
+            elif q.get("type") == "image":
+                st.markdown(f"<div style='font-size: 0.95rem; font-weight: 600; color: #ffffff; margin: 0.75rem 0;'>{q.get('content')}</div>", unsafe_allow_html=True)
+                img_path = q.get("image_path")
+                if img_path and os.path.exists(img_path):
+                    st.image(img_path, use_container_width=True)
+            else:
+                st.markdown(f"<div style='font-size: 1.05rem; font-weight: 600; color: #ffffff; margin: 0.85rem 0;'>{q.get('content')}</div>", unsafe_allow_html=True)
+
+            # Feedback & Submission area
+            if is_solved:
+                st.markdown(
+                    f"""
+                    <div style="background-color: #111111; border: 1px solid #333333; border-radius: 4px; padding: 0.85rem 1rem; margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 800; color: #ffffff; font-size: 0.95rem;">&#10003; SOLVED</div>
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #888888; margin-top: 2px;">
+                                SOLVED BY: <strong style="color: #ffffff;">{q.get('solved_by', 'CONTESTANT')}</strong> &bull; {q.get('solved_at', 'Completed')}
+                            </div>
+                        </div>
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 800; color: #ffffff;">
+                            REWARD: +{q.get('points', 500)} POINTS
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            else:
+                # Question feedback alert
+                fb = st.session_state.question_feedback.get(q["id"])
+                if fb:
+                    if fb.get("correct"):
+                        st.markdown(
+                            f"""
+                            <div style="background-color: #181818; border: 1px solid #ffffff; border-radius: 4px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;">
+                                {fb.get('msg')}
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            f"""
+                            <div class="bb-shake" style="background-color: #111111; border: 1px solid #444444; border-radius: 4px; padding: 0.65rem 0.85rem; font-size: 0.85rem; font-weight: 700; color: #cccccc; margin-bottom: 0.5rem;">
+                                {fb.get('msg')}
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+
+                col_inp, col_sub = st.columns([0.78, 0.22])
+                with col_inp:
+                    ans_input = st.text_input(
+                        "Your answer",
+                        placeholder="Type answer here...",
+                        key=f"input_{q['id']}",
+                        label_visibility="collapsed"
+                    )
+                with col_sub:
+                    if st.button("SUBMIT", key=f"btn_sub_{q['id']}", use_container_width=True):
+                        if not active_contestant:
+                            st.error("No active contestant selected.")
+                        else:
+                            ok, msg, pts = submit_answer(q["id"], active_contestant["id"], ans_input)
+                            if ok:
+                                st.session_state.question_feedback[q["id"]] = {"correct": True, "msg": msg}
+                                trigger_toast(f"✓ {active_contestant['name']} solved {q.get('title', q['id'])} (+{pts} pts)")
+                                st.rerun()
+                            else:
+                                st.session_state.question_feedback[q["id"]] = {"correct": False, "msg": msg}
+                                st.rerun()
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='border-top: 1px solid #222222; margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+
+    # QUESTION MANAGEMENT — BIG BOSS
+    with st.expander("＋ QUESTION CONTROL — CREATE & MANAGE CHALLENGES", expanded=False):
+        st.markdown("##### CREATE NEW CHALLENGE QUESTION")
+        col_cq1, col_cq2 = st.columns(2)
+        with col_cq1:
+            cq_title = st.text_input("Question Identifier", value=f"Q{len(all_q)+1}", key="cq_title")
+            cq_type = st.selectbox("Question Type", ["Hexadecimal", "ASCII / Number Sequence", "Morse / Symbol", "Text", "Image"], key="cq_type")
+            cq_content = st.text_area("Question Content / Code / Clue", placeholder="Enter the cipher text, sequence, or riddle...", key="cq_content")
+            cq_hint = st.text_input("Hint / Category Note", placeholder="Brief context clue...", key="cq_hint")
+
+        with col_cq2:
+            cq_answer = st.text_input("Expected Correct Answer", placeholder="Exact answer string...", key="cq_answer")
+            col_pts1, col_pts2 = st.columns(2)
+            with col_pts1:
+                cq_points = st.number_input("Base Points", min_value=50, max_value=2000, value=500, step=50, key="cq_points")
+            with col_pts2:
+                cq_max_pts = st.number_input("Maximum Points", min_value=50, max_value=5000, value=1000, step=50, key="cq_max_pts")
+            cq_case_sens = st.checkbox("Case Sensitive Answer", value=False, key="cq_case_sens")
+            cq_img = st.text_input("Image Asset Path (optional)", placeholder="e.g. assets/blueprint.svg", key="cq_img")
+
+            st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+            if st.button("CREATE QUESTION", use_container_width=True, key="btn_create_q"):
+                type_map = {
+                    "Hexadecimal": "hex",
+                    "ASCII / Number Sequence": "ascii",
+                    "Morse / Symbol": "symbol",
+                    "Text": "text",
+                    "Image": "image"
+                }
+                ok, msg = create_question(
+                    title=cq_title,
+                    qtype=type_map.get(cq_type, "text"),
+                    content=cq_content,
+                    answer=cq_answer,
+                    points=cq_points,
+                    max_points=cq_max_pts,
+                    hint=cq_hint,
+                    case_sensitive=cq_case_sens,
+                    image_path=cq_img if cq_img else None
+                )
+                if ok:
+                    trigger_toast(f"✓ {cq_title} created successfully")
+                    st.rerun()
+                else:
+                    st.error(msg)
+
+        st.markdown("<div style='border-top: 1px solid #222222; margin: 1rem 0;'></div>", unsafe_allow_html=True)
+        st.markdown("##### MANAGE EXISTING QUESTIONS")
+        if not all_q:
+            st.info("No questions to manage.")
+        else:
+            q_manage_options = [f"{q.get('title', q['id'])} ({q.get('type', 'text').upper()} | {q.get('points')} pts | {'SOLVED by ' + str(q.get('solved_by')) if q.get('solved') else 'UNSOLVED'})" for q in all_q]
+            selected_mq_idx = st.selectbox("Select Question to Manage", range(len(all_q)), format_func=lambda i: q_manage_options[i], key="sel_mq")
+            target_mq = all_q[selected_mq_idx]
+
+            col_btn_reset, col_btn_del = st.columns(2)
+            with col_btn_reset:
+                if st.button(f"RESET {target_mq.get('title', target_mq['id'])} TO UNSOLVED", key="btn_reset_mq", use_container_width=True):
+                    ok, msg = reset_question(target_mq["id"])
+                    if ok:
+                        trigger_toast(f"✓ {target_mq.get('title', target_mq['id'])} reset to unsolved")
+                        st.rerun()
+            with col_btn_del:
+                if st.button(f"DELETE {target_mq.get('title', target_mq['id'])}", key="btn_del_mq", use_container_width=True):
+                    ok, msg = delete_question(target_mq["id"])
+                    if ok:
+                        trigger_toast(f"✓ {target_mq.get('title', target_mq['id'])} deleted")
+                        st.rerun()
+
+
+# ==============================================================================
 # VIEW 5: NOMINATIONS
 # ==============================================================================
 elif "Nominations" in selected_nav:
@@ -1224,6 +1545,19 @@ elif "Control Room" in selected_nav:
             st.metric("PENDING TASKS", len(pending_tasks))
         with stat_cols3[3]:
             st.metric("NOMINEES IN DANGER", len(nominees))
+
+        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+        st.markdown("##### QUESTIONS & CHALLENGE ANALYTICS")
+        q_stats = get_question_stats()
+        stat_cols4 = st.columns(4)
+        with stat_cols4[0]:
+            st.metric("QUESTIONS SOLVED", f"{q_stats['solved']} / {q_stats['total']}")
+        with stat_cols4[1]:
+            st.metric("QUESTIONS REMAINING", q_stats["remaining"])
+        with stat_cols4[2]:
+            st.metric("QUESTION POINTS AWARDED", f"{q_stats['points_awarded']:,} PTS")
+        with stat_cols4[3]:
+            st.metric("TOP QUESTION SOLVER", q_stats["top_solver"])
 
         st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
         st.markdown("##### POINTS DISTRIBUTION (STRICT MONOCHROME)")

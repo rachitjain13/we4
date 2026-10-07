@@ -6,6 +6,7 @@ Strict Monochrome UI Components & Helpers
 import os
 import streamlit as st
 from utils.contestants import get_active_contestants, get_current_captain
+from utils.alerts import get_unread_alerts_count
 
 def apply_custom_styles():
     """Inject strict monochrome CSS styling."""
@@ -19,12 +20,13 @@ def render_header():
     """
     Renders Executive Command Header.
     Left: BIG BOSS / HOUSE COMMAND CENTER
-    Right: ● LIVE / CAPTAIN: ... / ACTIVE: ...
+    Right: ● LIVE / CAPTAIN: ... / ACTIVE: ... / ALERTS: [...]
     Strictly monochrome with subtle white pulse.
     """
     captain = get_current_captain()
     cap_name = captain["name"].upper() if captain else "NONE ASSIGNED"
     active_count = len(get_active_contestants())
+    unread_alerts = get_unread_alerts_count()
 
     header_html = f"""
     <div class="bb-header">
@@ -41,6 +43,9 @@ def render_header():
         </div>
         <div class="bb-meta-item">
           ACTIVE: <strong>{active_count}</strong>
+        </div>
+        <div class="bb-meta-item">
+          ALERTS: <strong>[{unread_alerts}]</strong>
         </div>
       </div>
     </div>

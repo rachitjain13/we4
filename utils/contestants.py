@@ -1,6 +1,7 @@
 from datetime import datetime
 import streamlit as st
 from utils.state import add_activity_log
+from utils.alerts import add_alert
 
 def get_all_contestants():
     return st.session_state.get("contestants", [])
@@ -66,6 +67,7 @@ def set_captain(contestant_id):
         f"{target['name']} replaced {prev_name} as House Captain.",
         log_type="CAPTAINCY"
     )
+    add_alert("IMPORTANT", "House Captain Changed", f"{target['name']} ({target['team']}) is now House Captain.", priority="HIGH", related_contestant=target['name'])
     return True, f"{target['name']} is now House Captain."
 
 def adjust_points(contestant_id, points_delta, reason="Manual adjustment"):
@@ -88,6 +90,8 @@ def adjust_points(contestant_id, points_delta, reason="Manual adjustment"):
     sign = "+" if actual_delta >= 0 else ""
     log_text = f"{target['name']} received {sign}{actual_delta} points. Reason: {reason} (Total: {new_points})"
     add_activity_log(log_text, log_type="POINTS")
+    if abs(actual_delta) >= 50:
+        add_alert("INFO", "Points Updated", f"{target['name']} ({target['team']}) received {sign}{actual_delta} points. Reason: {reason}.", priority="LOW", related_contestant=target['name'])
     return True, f"Updated {target['name']}'s points to {new_points} ({sign}{actual_delta})."
 
 def nominate_contestant(contestant_id, reason="Big Boss discretion"):
@@ -119,6 +123,7 @@ def nominate_contestant(contestant_id, reason="Big Boss discretion"):
         f"{target['name']} was nominated for eviction. Reason: {reason}",
         log_type="NOMINATION"
     )
+    add_alert("WARNING", "Danger Zone Update", f"{target['name']} ({target['team']}) has been nominated and entered the Danger Zone.", priority="HIGH", related_contestant=target['name'])
     return True, f"{target['name']} has been nominated and moved to Danger Zone."
 
 def revoke_nomination(contestant_id, reason="Revoked by Big Boss"):
@@ -144,6 +149,7 @@ def revoke_nomination(contestant_id, reason="Revoked by Big Boss"):
         f"Nomination revoked for {target['name']}. Reason: {reason}",
         log_type="NOMINATION"
     )
+    add_alert("INFO", "Nomination Revoked", f"Nomination revoked for {target['name']} ({target['team']}).", priority="LOW", related_contestant=target['name'])
     return True, f"Nomination revoked for {target['name']}."
 
 def grant_immunity(contestant_id, reason="Granted by Big Boss"):
@@ -177,6 +183,7 @@ def grant_immunity(contestant_id, reason="Granted by Big Boss"):
         f"{target['name']} was granted House Immunity{note}. Reason: {reason}",
         log_type="IMMUNITY"
     )
+    add_alert("SUCCESS", "Immunity Shield", f"{target['name']} ({target['team']}) was granted House Immunity.", priority="MEDIUM", related_contestant=target['name'])
     return True, f"Immunity granted to {target['name']}.{note}"
 
 def remove_immunity(contestant_id):
@@ -197,6 +204,7 @@ def remove_immunity(contestant_id):
         target["status"] = "ACTIVE"
         
     add_activity_log(f"Immunity stripped from {target['name']}.", log_type="IMMUNITY")
+    add_alert("WARNING", "Immunity Removed", f"Immunity was stripped from {target['name']} ({target['team']}).", priority="MEDIUM", related_contestant=target['name'])
     return True, f"Immunity removed from {target['name']}."
 
 def evict_contestant(contestant_id, reason="Official Big Boss Eviction"):
@@ -230,9 +238,11 @@ def evict_contestant(contestant_id, reason="Official Big Boss Eviction"):
         f"{target['name']} has been EVICTED from the House. Final Points: {target.get('points', 0)}.",
         log_type="EVICTION"
     )
+    add_alert("WARNING", "Contestant Evicted", f"{target['name']} ({target['team']}) has been evicted from the House. Final Score: {target.get('points', 0)}.", priority="CRITICAL", related_contestant=target['name'])
     
     # If was captain, log that house has no captain
     if was_captain:
         add_activity_log("House Captain was evicted. Big Boss must appoint a new Captain.", log_type="CAPTAINCY")
+        add_alert("IMPORTANT", "Captain Vacancy", "House Captain was evicted. Big Boss must appoint a new Captain.", priority="HIGH")
         
     return True, f"{target['name']} has been evicted from the House."
