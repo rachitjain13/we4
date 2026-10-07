@@ -1,0 +1,41 @@
+[
+  {
+    "id": "t-01",
+    "name": "House Cleanup & Sanitization",
+    "description": "Thorough sanitization of living quarters and store room per Big Boss standards.",
+    "assignee_type": "TEAM",
+    "assigned_to": "Team Alpha",
+    "points_reward": 100,
+    "duration_min": 30,
+    "deadline": "Today 12:00 PM",
+    "status": "IN PROGRESS",
+    "created_at": "Today 09:00 AM",
+    "completed_at": null
+  },
+  {
+    "id": "t-02",
+    "name": "Ration Allocation Challenge",
+    "description": "Strategic distribution and inventory count of weekly luxury ration items.",
+    "assignee_type": "TEAM",
+    "assigned_to": "Team Beta",
+    "points_reward": 150,
+    "duration_min": 45,
+    "deadline": "Today 04:00 PM",
+    "status": "PENDING",
+    "created_at": "Today 09:30 AM",
+    "completed_at": null
+  },
+  {
+    "id": "t-03",
+    "name": "Morning Fitness Endurance Drill",
+    "description": "Complete continuous 500-lap courtyard endurance run without stopping.",
+    "assignee_type": "CONTESTANT",
+    "assigned_to": "Aarav",
+    "points_reward": 50,
+    "duration_min": 20,
+    "deadline": "Today 08:00 AM",
+    "status": "COMPLETED",
+    "created_at": "Today 07:30 AM",
+    "completed_at": "Today 08:15 AM"
+  }
+]
