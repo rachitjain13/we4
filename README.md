@@ -23,21 +23,23 @@ The entire user interface strictly utilizes **only black, white, and neutral gra
 
 ---
 
-## ⚡ Complete Feature Checklist (All 13 Modules)
+## ⚡ Complete Feature Checklist (All 15 Modules)
 
 - [x] **01 Contestant Management**: Complete roster of 10 contestants across Team Alpha & Team Beta. Full management panel for points adjustment, captaincy assignment, immunity granting/stripping, nomination citations, and permanent eviction.
 - [x] **02 Live Leaderboard**: Real-time points ranking in descending order. Top `#01` leader prominence, delta calculations from front-runner, team aggregates, and **strict exclusion of evicted housemates**.
-- [x] **03 Task Management**: Complete lifecycle (`PENDING` ➔ `IN PROGRESS` ➔ `COMPLETED`). Marking completion **automatically disburses configured point bounties** to individual contestants or all active members of an assigned team.
-- [x] **04 Point System**: Precision point addition and deduction with mandatory justification citations. Strictly enforces a **minimum floor of 0 points** and blocks evicted contestants.
-- [x] **05 Questions / Puzzle Challenge**: Dedicated cipher and puzzle challenge arena. Supports **Hexadecimal**, **ASCII / Number Sequence**, **Morse / Symbol**, **Text Riddles**, and **Image Schematics**. Features solving contestant selection, real-time answer verification, instant point disbursement, subtle shake error animation, and full Big Boss question CRUD controls.
-- [x] **06 Captaincy**: Enforces the **single-captain rule**. Appointing a new captain automatically demotes the predecessor, updates global header indicators, and logs the event.
-- [x] **07 Nominations**: Formal nomination desk. **Strict rule enforced**: Immune contestants cannot be nominated (`◉ IMMUNE — NOMINATION DISABLED`). Duplicate nominations are prevented.
-- [x] **08 Immunity**: Shield granting and removal. Granting immunity to an already-nominated housemate automatically clears them from the Danger Zone.
-- [x] **09 Danger Zone**: High-risk containment block rendered in strict monochrome with bold white borders (`NO RED`). Displays citations, timestamps, points at risk, and quick pardon/eviction controls.
-- [x] **10 Big Boss Announcement**: Priority-tiered broadcast studio (`NORMAL`, `IMPORTANT`, `CRITICAL`). Active broadcasts pin to a persistent header banner across all views, with an archive log.
-- [x] **11 Task Timer**: Live countdown timer powered by non-blocking Streamlit fragments (`START`, `PAUSE`, `RESET`, custom MM:SS). Reaching `00:00` flashes `TIME'S UP` and automatically fires an official Big Boss broadcast.
-- [x] **12 House Statistics**: Live metrics covering house points, roster states, task completion rates, question solving analytics (Solved, Remaining, Points Awarded, Top Solver), and monochrome points distribution chart.
-- [x] **13 Eviction System**: Multi-step confirmation dialog with `CANCEL` and `CONFIRM EVICTION` buttons. Permanently removes contestants from active house, leaderboard, tasks, nominations, questions, and captaincy.
+- [x] **03 Performance Analytics**: Comprehensive analytical command interface. Top 8 KPI summary cards, transparent **Performance Score (0–100)** formula, surveillance spotlights (Top Performer, Task Leader, Puzzle Master, Highest Momentum, Under Pressure, Incumbent Captain), filterable contestant performance audit table, task completion velocity progress bar, danger zone risk breakdown, and Team Alpha vs Team Beta head-to-head faction comparison.
+- [x] **04 Questions / Puzzle Challenge**: Dedicated cipher and puzzle challenge arena. Supports **Hexadecimal**, **ASCII / Number Sequence**, **Morse / Symbol**, **Text Riddles**, and **Image Schematics**. Features solving contestant selection, real-time answer verification, instant point disbursement, subtle shake error animation, and full Big Boss question CRUD controls.
+- [x] **05 Task Management**: Complete lifecycle (`PENDING` ➔ `IN PROGRESS` ➔ `COMPLETED`). Marking completion **automatically disburses configured point bounties** to individual contestants or all active members of an assigned team.
+- [x] **06 Point System**: Precision point addition and deduction with mandatory justification citations. Strictly enforces a **minimum floor of 0 points** and blocks evicted contestants.
+- [x] **07 Captaincy**: Enforces the **single-captain rule**. Appointing a new captain automatically demotes the predecessor, updates global header indicators, and logs the event.
+- [x] **08 Nominations**: Formal nomination desk. **Strict rule enforced**: Immune contestants cannot be nominated (`◉ IMMUNE — NOMINATION DISABLED`). Duplicate nominations are prevented.
+- [x] **09 Immunity**: Shield granting and removal. Granting immunity to an already-nominated housemate automatically clears them from the Danger Zone.
+- [x] **10 Danger Zone**: High-risk containment block rendered in strict monochrome with bold white borders (`NO RED`). Displays citations, timestamps, points at risk, and quick pardon/eviction controls.
+- [x] **11 Big Boss Announcement**: Priority-tiered broadcast studio (`NORMAL`, `IMPORTANT`, `CRITICAL`). Active broadcasts pin to a persistent header banner across all views, with an archive log.
+- [x] **12 Alert Center & Live Notifications**: Real-time actionable notification engine. Auto-generates alerts (`INFO`, `WARNING`, `IMPORTANT`, `SUCCESS`) on state transitions (nominations, captaincy shifts, immunity grants/strips, point changes, task finishes, puzzle solutions, evictions, timer expiration). Displays unread counter badge in top header and sidebar (`ALERTS [X]`), filter by read/unread/type, mark read, mark all read, and clear read alerts.
+- [x] **13 Task Timer**: Live countdown timer powered by non-blocking Streamlit fragments (`START`, `PAUSE`, `RESET`, custom MM:SS). Reaching `00:00` flashes `TIME'S UP`, generates high-priority warning alerts, and automatically fires an official Big Boss broadcast.
+- [x] **14 House Statistics**: Live metrics covering house points, roster states, task completion rates, question solving analytics, and monochrome points distribution chart.
+- [x] **15 Eviction System**: Multi-step confirmation dialog with `CANCEL` and `CONFIRM EVICTION` buttons. Permanently removes contestants from active house, leaderboard, tasks, nominations, questions, and captaincy.
 
 ---
 
@@ -101,23 +103,37 @@ Open `http://localhost:8501` in your browser.
 
 ## 🧪 Evaluator Demo Flow
 
-1. **Overview**: View house status, 7 KPI cards, current captain (**Rahul**), and live activity feed.
-2. **Contestants**: Inspect contestant roster; add points to **Kabir** and observe toast and score updates.
+1. **Overview**: View house status, 7 KPI cards, current captain (**Rahul**), unread alert badge, and live activity feed.
+2. **Contestants**: Inspect contestant roster; add points to **Kabir** and observe toast, score updates, and live alert generation.
 3. **Leaderboard**: Switch to `▌ Leaderboard` and see rankings update.
-4. **Tasks**: Create and complete a house task; confirm automatic points disbursement to team/contestant.
-5. **Questions / Puzzle Challenge**:
+4. **Performance Analytics**:
+   - Navigate to `▌ Performance Analytics`.
+   - Inspect the **8 top KPI cards** (Active Contestants, Total Points, Average Points, Completed Tasks, Nominees, Immune, Pending Tasks, Questions Solved).
+   - Review **Surveillance Spotlights** (Points Leader, Task Leader, Puzzle Master, Momentum Score, Under Maximum Pressure, Incumbent Captain).
+   - Audit contestant breakdown in Tab 1 with transparent **Performance Score (0–100)** progress metrics.
+   - Filter by Team (`ALPHA`/`BETA`) and Status (`NOMINATED`/`IMMUNE`/`CAPTAIN`).
+   - Switch to Tab 4 to review **Faction Analysis: Team Alpha vs Team Beta** head-to-head comparison and dominance verdict.
+5. **Tasks**: Create and complete a house task; confirm automatic points disbursement and task completion alert.
+6. **Questions / Puzzle Challenge**:
    - Navigate to `▌ Questions`.
    - Observe the 3 progress cards (`0 / 5 SOLVED`, `0 PTS`, `5 REMAINING`).
    - Select solving contestant: **Aarav**.
    - Review Q1 (Hex): `46 89 5e 05 ab 1e 74 07 1c 7a cb`.
    - Submit incorrect answer `"wrong"`: observe subtle card shake and `✕ INCORRECT ANSWER. Try again.`
    - Submit correct answer `"solaris"`: observe `✓ CORRECT ANSWER! +500 POINTS`, card transitions to `✓ SOLVED`, and Aarav receives +500 points immediately!
-   - Switch to `▌ Leaderboard` to observe Aarav's points jump by +500.
    - Review Q5 (Image): Examine the monochrome surveillance blueprint schematic and submit `"vault 9"`.
-6. **Captaincy**: Appoint a new House Captain and verify top header updates.
-7. **Nominations**: Try nominating immune contestant (blocked), then nominate non-immune contestant.
-8. **Danger Zone**: Inspect nominated contestants in the risk containment block.
-9. **Announcements**: Broadcast an announcement and verify top banner across all views.
-10. **Timer**: Start/pause/reset the live task countdown timer.
-11. **House Statistics**: Inspect comprehensive analytics, including the new **Questions & Challenge Analytics** panel (Questions Solved, Remaining, Points Awarded, Top Solver).
-12. **Eviction**: Evict a contestant with confirmation; verify they are excluded from the leaderboard, nominations, and question solving.
+7. **Captaincy**: Appoint a new House Captain and verify top header updates and captaincy alert.
+8. **Nominations**: Try nominating immune contestant (blocked), then nominate non-immune contestant.
+9. **Danger Zone**: Inspect nominated contestants in the risk containment block.
+10. **Announcements**: Broadcast an announcement and verify top banner across all views.
+11. **Alert Center**:
+    - Navigate to `▌ Alert Center`.
+    - Check the unread counter badge (`ALERTS [X]`) in the header and sidebar.
+    - Inspect real-time monochrome alert cards categorized by severity (`[WARNING]`, `[IMPORTANT]`, `[SUCCESS]`, `[INFO]`).
+    - Filter by Status (`UNREAD ONLY`, `READ ONLY`) or Severity.
+    - Click `MARK READ` on an alert or click `✓ MARK ALL AS READ`.
+    - Click `🗑 CLEAR READ ALERTS` to purge acknowledged items.
+12. **Timer**: Start/pause/reset the live task countdown timer, or trigger `TRIGGER TIME'S UP NOW` to verify automatic broadcast and critical warning alert.
+13. **House Statistics**: Inspect comprehensive analytics, including the Questions & Challenge Analytics panel.
+14. **Eviction**: Evict a contestant with confirmation; verify they are excluded from the leaderboard, nominations, and question solving.
+

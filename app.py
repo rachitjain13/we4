@@ -814,6 +814,422 @@ elif "Leaderboard" in selected_nav:
 
 
 # ==============================================================================
+# VIEW: PERFORMANCE ANALYTICS
+# ==============================================================================
+elif "Performance Analytics" in selected_nav:
+    st.markdown("### HOUSE PERFORMANCE ANALYTICS")
+    st.markdown("Surveillance Analytics Engine: Live aggregated metrics, transparent contestant performance scoring, risk vectors, and factional analysis.")
+
+    # Top KPI Summary Cards (8 metrics, in two clean rows of 4 columns)
+    summary = get_analytics_summary()
+    
+    kpi_col1, kpi_col2, kpi_col3, kpi_col4 = st.columns(4)
+    with kpi_col1:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Active Contestants</div>
+                <div class="bb-kpi-val">{summary['active_contestants']}</div>
+                <div class="bb-kpi-sub">Inside Big Boss House</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with kpi_col2:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Total Points</div>
+                <div class="bb-kpi-val">{summary['total_points']:,}</div>
+                <div class="bb-kpi-sub">House collective score</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with kpi_col3:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Average Points</div>
+                <div class="bb-kpi-val">{summary['average_points']}</div>
+                <div class="bb-kpi-sub">Per active contestant</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with kpi_col4:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Tasks Completed</div>
+                <div class="bb-kpi-val">{summary['tasks_completed']}</div>
+                <div class="bb-kpi-sub">{summary['tasks_pending']} tasks pending</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
+    kpi_col5, kpi_col6, kpi_col7, kpi_col8 = st.columns(4)
+    with kpi_col5:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Total Nominees</div>
+                <div class="bb-kpi-val" style="color: {'#ffffff' if summary['total_nominees'] > 0 else '#888888'};">{summary['total_nominees']}</div>
+                <div class="bb-kpi-sub">In Danger Zone</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with kpi_col6:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Immune Contestants</div>
+                <div class="bb-kpi-val">{summary['immune_contestants']}</div>
+                <div class="bb-kpi-sub">Protected from eviction</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with kpi_col7:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Tasks Pending</div>
+                <div class="bb-kpi-val">{summary['tasks_pending']}</div>
+                <div class="bb-kpi-sub">Awaiting execution</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with kpi_col8:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card">
+                <div class="bb-kpi-label">Questions Solved</div>
+                <div class="bb-kpi-val">{summary['questions_solved']}</div>
+                <div class="bb-kpi-sub">Challenge ciphers cracked</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+
+    # Spotlights Row
+    spotlights = get_performance_spotlights()
+    st.markdown("#### SURVEILLANCE SPOTLIGHTS & MOMENTUM")
+    sp_col1, sp_col2, sp_col3 = st.columns(3)
+    with sp_col1:
+        st.markdown(
+            f"""
+            <div class="bb-analytics-metric-box">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888; text-transform: uppercase;">&#9733; TOP POINTS LEADER</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #ffffff; margin-top: 4px;">{spotlights['top_performer']}</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #666666; margin-top: 2px;">Highest total accumulated score</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f"""
+            <div class="bb-analytics-metric-box">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888; text-transform: uppercase;">&#9874; TASK EXECUTION LEADER</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #ffffff; margin-top: 4px;">{spotlights['top_task_performer']}</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #666666; margin-top: 2px;">Most tasks completed in house</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with sp_col2:
+        st.markdown(
+            f"""
+            <div class="bb-analytics-metric-box">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888; text-transform: uppercase;">&#127942; PUZZLE CIPHER MASTER</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #ffffff; margin-top: 4px;">{spotlights['top_puzzle_performer']}</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #666666; margin-top: 2px;">Most challenge questions deciphered</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f"""
+            <div class="bb-analytics-metric-box">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888; text-transform: uppercase;">&#9889; HIGHEST MOMENTUM SCORE</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #ffffff; margin-top: 4px;">{spotlights['highest_momentum']}</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #666666; margin-top: 2px;">Weighted efficiency composite score</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with sp_col3:
+        st.markdown(
+            f"""
+            <div class="bb-analytics-metric-box">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888; text-transform: uppercase;">&#9888; UNDER MAXIMUM PRESSURE</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #ffffff; margin-top: 4px;">{spotlights['most_nominated']}</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #666666; margin-top: 2px;">Facing public voting and danger zone</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            f"""
+            <div class="bb-analytics-metric-box">
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888; text-transform: uppercase;">&#9813; INCUMBENT HOUSE CAPTAIN</div>
+                <div style="font-size: 1rem; font-weight: 800; color: #ffffff; margin-top: 4px;">{spotlights['current_captain']}</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #666666; margin-top: 2px;">Executive authority and house immunity</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+
+    # Detailed Analytical Views Tabs
+    tab_audit, tab_tasks, tab_noms, tab_teams = st.tabs([
+        "1. Contestant Performance Audit",
+        "2. Task Analytics & Velocity",
+        "3. Nomination & Threat Vectors",
+        "4. Alpha vs Beta Faction Comparison"
+    ])
+
+    with tab_audit:
+        st.markdown("#### CONTESTANT PERFORMANCE AUDIT & COMPOSITE SCORING")
+        st.markdown(
+            "The **Performance Score (0–100)** is computed transparently: "
+            "50% Points Normalization + 30% Task Completion + 20% Questions Deciphered - 10-point Nomination Penalty."
+        )
+
+        col_f1, col_f2, col_f3 = st.columns([2, 2, 3])
+        with col_f1:
+            team_sel = st.selectbox("Filter Team", ["ALL", "ALPHA", "BETA"], key="analytics_team_filter")
+        with col_f2:
+            status_sel = st.selectbox("Filter Status", ["ALL", "ACTIVE ONLY", "NOMINATED", "IMMUNE", "CAPTAIN", "EVICTED"], key="analytics_status_filter")
+        with col_f3:
+            search_query = st.text_input("Search Contestant Name", "", key="analytics_search").strip().upper()
+
+        perf_df = get_contestant_performance_data(team_filter=team_sel, status_filter=status_sel)
+        if not perf_df.empty and search_query:
+            perf_df = perf_df[perf_df["Contestant"].str.contains(search_query, na=False)]
+
+        if not perf_df.empty:
+            st.dataframe(
+                perf_df,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Rank": st.column_config.TextColumn("Rank", width="small"),
+                    "Contestant": st.column_config.TextColumn("Contestant", width="medium"),
+                    "Team": st.column_config.TextColumn("Team", width="small"),
+                    "Points": st.column_config.NumberColumn("Points", format="%d"),
+                    "Tasks Completed": st.column_config.NumberColumn("Tasks Done", format="%d"),
+                    "Questions Solved": st.column_config.NumberColumn("Ciphers Solved", format="%d"),
+                    "Nominated": st.column_config.TextColumn("Nominated", width="small"),
+                    "Immune": st.column_config.TextColumn("Immune", width="small"),
+                    "Status": st.column_config.TextColumn("Status", width="small"),
+                    "Performance Score": st.column_config.ProgressColumn(
+                        "Performance Score (0-100)",
+                        help="Transparent composite metric (0 to 100)",
+                        format="%.1f",
+                        min_value=0,
+                        max_value=100
+                    )
+                }
+            )
+        else:
+            render_empty_state("NO CONTESTANTS FOUND", "No contestants matched your filter criteria.")
+
+    with tab_tasks:
+        st.markdown("#### TASK COMPLETION ANALYTICS & VELOCITY")
+        all_tasks = get_all_tasks()
+        total_tasks = len(all_tasks)
+        comp_tasks = len([t for t in all_tasks if t.get("status") == "COMPLETED"])
+        active_tasks = len([t for t in all_tasks if t.get("status") == "IN_PROGRESS"])
+        pend_tasks = len([t for t in all_tasks if t.get("status") == "PENDING"])
+
+        rate = (comp_tasks / total_tasks * 100) if total_tasks > 0 else 0
+
+        st.progress(rate / 100, text=f"TASK COMPLETION RATE: {comp_tasks}/{total_tasks} ({rate:.1f}%)")
+        
+        st.markdown("<div style='height: 0.75rem;'></div>", unsafe_allow_html=True)
+        col_tk1, col_tk2, col_tk3 = st.columns(3)
+        with col_tk1:
+            st.markdown(
+                f"""
+                <div class="bb-analytics-metric-box">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888;">COMPLETED MISSIONS</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #ffffff;">{comp_tasks}</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #aaaaaa;">Points distributed to winners</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_tk2:
+            st.markdown(
+                f"""
+                <div class="bb-analytics-metric-box">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888;">IN PROGRESS</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #ffffff;">{active_tasks}</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #aaaaaa;">Under active surveillance</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_tk3:
+            st.markdown(
+                f"""
+                <div class="bb-analytics-metric-box">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888;">PENDING ASSIGNMENT</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #ffffff;">{pend_tasks}</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #aaaaaa;">Queued for house release</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        if all_tasks:
+            task_records = [{
+                "Task Title": t["title"],
+                "Points": t["points"],
+                "Status": t["status"],
+                "Assigned To": (t.get("assigned_to") or "UNASSIGNED").upper(),
+                "Winner": (t.get("winner") or "NONE").upper(),
+                "Timestamp": t.get("created_at", "")
+            } for t in all_tasks]
+            st.dataframe(pd.DataFrame(task_records), use_container_width=True, hide_index=True)
+
+    with tab_noms:
+        st.markdown("#### NOMINATION & THREAT VECTOR ANALYSIS")
+        active_c = get_active_contestants()
+        nominees = [c for c in active_c if c.get("is_nominated", False)]
+        immune_c = [c for c in active_c if c.get("is_immune", False)]
+        safe_c = [c for c in active_c if not c.get("is_nominated", False) and not c.get("is_immune", False)]
+
+        col_n1, col_n2, col_n3 = st.columns(3)
+        with col_n1:
+            st.markdown(
+                f"""
+                <div class="bb-analytics-metric-box" style="border-left: 3px solid #ffffff;">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888;">DANGER ZONE (NOMINATED)</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #ffffff;">{len(nominees)}</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #aaaaaa;">At immediate eviction risk</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_n2:
+            st.markdown(
+                f"""
+                <div class="bb-analytics-metric-box">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888;">IMMUNE / SHIELDED</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #ffffff;">{len(immune_c)}</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #aaaaaa;">Exempt from vote this cycle</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with col_n3:
+            st.markdown(
+                f"""
+                <div class="bb-analytics-metric-box">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888;">NEUTRAL / UNEXPOSED</div>
+                    <div style="font-size: 1.4rem; font-weight: 800; color: #ffffff;">{len(safe_c)}</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #aaaaaa;">Safe from danger zone</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        if nominees:
+            st.markdown("##### Current Danger Zone Contenders")
+            nom_records = [{
+                "Contestant": c["name"].upper(),
+                "Team": c["team"].upper(),
+                "Points": c.get("points", 0),
+                "Tasks Done": c.get("tasks_completed", 0),
+                "Eviction Risk Factor": "HIGH (Low Points)" if c.get("points", 0) < 500 else "MEDIUM"
+            } for c in nominees]
+            st.dataframe(pd.DataFrame(nom_records), use_container_width=True, hide_index=True)
+        else:
+            st.info("No contestants are currently nominated.")
+
+    with tab_teams:
+        st.markdown("#### FACTION ANALYSIS: TEAM ALPHA VS TEAM BETA")
+        team_data = get_team_comparison_analytics()
+        alpha = team_data["alpha"]
+        beta = team_data["beta"]
+
+        col_ta, col_tb = st.columns(2)
+        with col_ta:
+            st.markdown(
+                f"""
+                <div class="bb-analytics-metric-box" style="border: 1px solid #444444;">
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #ffffff; letter-spacing: 0.08em;">TEAM ALPHA</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #888888; margin-top: 2px;">
+                        MEMBERS: <strong style="color: #ffffff;">{alpha['members']}</strong>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid #222222; margin: 10px 0;">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 2; color: #cccccc;">
+                        <div>&bull; Total Points: <strong style="color: #ffffff;">{alpha['total_points']:,} PTS</strong></div>
+                        <div>&bull; Average Points / Member: <strong style="color: #ffffff;">{alpha['average_points']} PTS</strong></div>
+                        <div>&bull; Tasks Completed: <strong style="color: #ffffff;">{alpha['tasks_completed']}</strong></div>
+                        <div>&bull; Questions Solved: <strong style="color: #ffffff;">{alpha['questions_solved']}</strong></div>
+                        <div>&bull; Nominees in Danger: <strong style="color: #ffffff;">{alpha['nominations']}</strong></div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col_tb:
+            st.markdown(
+                f"""
+                <div class="bb-analytics-metric-box" style="border: 1px solid #444444;">
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #ffffff; letter-spacing: 0.08em;">TEAM BETA</div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #888888; margin-top: 2px;">
+                        MEMBERS: <strong style="color: #ffffff;">{beta['members']}</strong>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid #222222; margin: 10px 0;">
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 2; color: #cccccc;">
+                        <div>&bull; Total Points: <strong style="color: #ffffff;">{beta['total_points']:,} PTS</strong></div>
+                        <div>&bull; Average Points / Member: <strong style="color: #ffffff;">{beta['average_points']} PTS</strong></div>
+                        <div>&bull; Tasks Completed: <strong style="color: #ffffff;">{beta['tasks_completed']}</strong></div>
+                        <div>&bull; Questions Solved: <strong style="color: #ffffff;">{beta['questions_solved']}</strong></div>
+                        <div>&bull; Nominees in Danger: <strong style="color: #ffffff;">{beta['nominations']}</strong></div>
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        # Comparative advantage verdict
+        diff = alpha['total_points'] - beta['total_points']
+        if diff > 0:
+            verdict = f"TEAM ALPHA LEADS BY +{diff:,} POINTS"
+        elif diff < 0:
+            verdict = f"TEAM BETA LEADS BY +{abs(diff):,} POINTS"
+        else:
+            verdict = "TEAMS ARE CURRENTLY TIED IN TOTAL POINTS"
+
+        st.markdown(
+            f"""
+            <div style="background-color: #0d0d0d; border: 1px solid #333333; padding: 0.85rem 1.25rem; border-radius: 4px; text-align: center; margin-top: 0.5rem;">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; color: #888888; text-transform: uppercase;">
+                    FACTION DOMINANCE VERDICT:
+                </span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 800; color: #ffffff; margin-left: 0.5rem;">
+                    {verdict}
+                </span>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+# ==============================================================================
 # VIEW: QUESTIONS / PUZZLE CHALLENGE
 # ==============================================================================
 elif "Questions" in selected_nav:
@@ -1372,6 +1788,121 @@ elif "Announcements" in selected_nav:
 
 
 # ==============================================================================
+# VIEW: LIVE ALERT CENTER & EVENT NOTIFICATIONS
+# ==============================================================================
+elif "Alert Center" in selected_nav:
+    st.markdown("### LIVE ALERT CENTER")
+    st.markdown("Surveillance Notification Feed: Real-time system alerts, danger zone notifications, immunity shifts, and executive event logging.")
+
+    all_alerts = get_all_alerts()
+    unread_alerts = get_unread_alerts()
+    unread_count = len(unread_alerts)
+    total_count = len(all_alerts)
+
+    # Top Control & Stats Bar
+    col_ab1, col_ab2, col_ab3, col_ab4 = st.columns([2, 2, 2, 2])
+    with col_ab1:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card" style="padding: 0.75rem 1rem;">
+                <div class="bb-kpi-label">Unread Alerts</div>
+                <div class="bb-kpi-val" style="font-size: 1.3rem; color: {'#ffffff' if unread_count > 0 else '#777777'};">[{unread_count}]</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col_ab2:
+        st.markdown(
+            f"""
+            <div class="bb-kpi-card" style="padding: 0.75rem 1rem;">
+                <div class="bb-kpi-label">Total Alerts</div>
+                <div class="bb-kpi-val" style="font-size: 1.3rem;">{total_count}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with col_ab3:
+        st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+        if st.button("✓ MARK ALL AS READ", use_container_width=True, key="mark_all_read_btn"):
+            mark_all_alerts_read()
+            trigger_toast("All alerts marked as read.")
+            st.rerun()
+    with col_ab4:
+        st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+        if st.button("🗑 CLEAR READ ALERTS", use_container_width=True, key="clear_read_alerts_btn"):
+            clear_old_alerts()
+            trigger_toast("Read alerts cleared from feed.")
+            st.rerun()
+
+    st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+
+    # Filter Bar
+    col_af1, col_af2 = st.columns(2)
+    with col_af1:
+        read_filter = st.radio("Status Filter", ["ALL", "UNREAD ONLY", "READ ONLY"], horizontal=True, key="alert_read_filter")
+    with col_af2:
+        type_filter = st.selectbox("Severity / Type Filter", ["ALL", "WARNING", "IMPORTANT", "SUCCESS", "INFO"], key="alert_type_filter")
+
+    # Filter alerts
+    filtered_alerts = all_alerts
+    if read_filter == "UNREAD ONLY":
+        filtered_alerts = [a for a in filtered_alerts if not a.get("read", False)]
+    elif read_filter == "READ ONLY":
+        filtered_alerts = [a for a in filtered_alerts if a.get("read", False)]
+
+    if type_filter != "ALL":
+        filtered_alerts = [a for a in filtered_alerts if a.get("type") == type_filter]
+
+    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+
+    if filtered_alerts:
+        for alert in filtered_alerts:
+            is_unread = not alert.get("read", False)
+            card_class = "bb-alert-card unread" if is_unread else "bb-alert-card"
+            
+            # Action button and card rendering
+            col_card, col_action = st.columns([6, 1])
+            with col_card:
+                badge_type = alert.get("type", "INFO")
+                priority = alert.get("priority", "MEDIUM")
+                unread_indicator = "● NEW &bull; " if is_unread else ""
+                
+                st.markdown(
+                    f"""
+                    <div class="{card_class}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="bb-alert-badge">[{badge_type}]</span>
+                                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #888888;">PRIORITY: {priority}</span>
+                                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #ffffff; font-weight: 800;">{unread_indicator}</span>
+                            </div>
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #666666;">
+                                {alert.get('timestamp', '')}
+                            </div>
+                        </div>
+                        <div style="font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 4px;">
+                            {alert.get('title', '')}
+                        </div>
+                        <div style="font-family: 'Inter', sans-serif; font-size: 0.82rem; color: #bbbbbb; line-height: 1.5;">
+                            {alert.get('message', '')}
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            with col_action:
+                st.markdown("<div style='height: 0.8rem;'></div>", unsafe_allow_html=True)
+                if is_unread:
+                    if st.button("MARK READ", key=f"mark_read_{alert['id']}", use_container_width=True):
+                        mark_alert_read(alert["id"])
+                        st.rerun()
+                else:
+                    st.markdown("<div style='font-family: \"JetBrains Mono\", monospace; font-size: 0.68rem; color: #555555; text-align: center; padding-top: 0.5rem;'>READ</div>", unsafe_allow_html=True)
+    else:
+        render_empty_state("NO ALERTS IN FEED", "No alerts match the selected filter criteria.")
+
+
+# ==============================================================================
 # VIEW 8: CONTROL ROOM (TIMER, STATISTICS, EVICTION, ACTIVITY LEDGER)
 # ==============================================================================
 elif "Control Room" in selected_nav:
@@ -1408,6 +1939,7 @@ elif "Control Room" in selected_nav:
                     st.session_state.timer_finished = True
                     broadcast_announcement("TIME'S UP. THE TASK HAS ENDED.", "Critical")
                     add_activity_log("TASK TIMER EXPIRED: 'Time's Up' broadcasted.", "TASK")
+                    add_alert("WARNING", "TASK TIMER EXPIRED", "The countdown timer reached 0:00. 'TIME'S UP' broadcasted to the house.", "HIGH")
 
             rem = st.session_state.get("timer_remaining_sec", 1200)
             mins = rem // 60
@@ -1468,6 +2000,7 @@ elif "Control Room" in selected_nav:
                 st.session_state.timer_finished = True
                 broadcast_announcement("TIME'S UP. THE TASK HAS ENDED.", "Critical")
                 add_activity_log("Big Boss manually triggered TIME'S UP.", "TASK")
+                add_alert("WARNING", "TASK TIMER EXPIRED", "Big Boss manually triggered 'TIME'S UP'.", "HIGH")
                 st.rerun()
 
         st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
